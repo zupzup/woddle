@@ -1,0 +1,12 @@
+language: rust
+services: 
+  - postgresql
+
+rust:
+  - stable
+  - nightly
+
+script:
+  - RUST_BACKTRACE=1 cargo build --verbose --all
+  - RUST_BACKTRACE=1 cargo test --verbose --all
+  - RUST_BACKTRACE=1 cargo test --features=pool-mobc --verbose --all
