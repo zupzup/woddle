@@ -1,6 +1,6 @@
 [package]
 name = "woddle"
-description = "TODO"
+description = "An async, synchronized, database-backed Rust job scheduler"
 version = "0.1.0"
 authors = ["Mario Zupan <mario@zupzup.org>"]
 edition = "2018"
@@ -8,8 +8,8 @@ license = "Apache-2.0"
 readme = "README.md"
 documentation = "https://docs.rs/woddle"
 repository = "https://github.com/zupzup/woddle"
-categories = ["web", "job", "cron", "database"]
-keywords = ["woddle", "job", "cron", "database"]
+categories = ["scheduler", "job", "cron", "quartz"]
+keywords = ["woddle", "job", "cron", "quartz"]
 
 [dependencies]
 chrono = { version = "0.4" }
