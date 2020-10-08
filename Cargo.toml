@@ -8,7 +8,7 @@ license = "Apache-2.0"
 readme = "README.md"
 documentation = "https://docs.rs/woddle"
 repository = "https://github.com/zupzup/woddle"
-categories = ["scheduler", "job", "cron", "quartz"]
+categories = ["date-and-time", "asynchronous", "web-programming"]
 keywords = ["woddle", "job", "cron", "quartz"]
 
 [dependencies]
