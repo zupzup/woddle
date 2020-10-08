@@ -1,5 +1,27 @@
 //! An async, synchronized, database-backed Rust job scheduler
 //!
+//! This library provides an async job runner, which can run user-defined jobs in an interval, or
+//! based on a cron schedule.
+//!
+//! Also, the library automatically synchronizes multiple instances of the runner via PostgreSQL.
+//! This is important to ensure, that a job is only run once for each interval, or schedule.
+//!
+//! A `Job` in this library can be created by implementing the `Job` trait. There the user can
+//! define a custom `run` function, which is executed for each interval, or schedule of the job.
+//!
+//! This interval, as well as other relevant metadata, needs to be configured using a `JobConfig`
+//! for each job.
+//!
+//! Then, once all your jobs are defined, you can create a `JobRunner`. This is the main mechanism
+//! underlying this scheduling library. It will check, at a user-defined interval, if a job needs
+//! to run, or not.
+//!
+//! This `JobRunner` is configured using the `RunnerConfig`, where the user can define database
+//! configuration, as well as an initial delay and the interval for checking for job runs.
+//!
+//! Once everything is configured, you can run the `JobRunner` and, if it doesn't return an error
+//! during job validation, it will run forever, scheduling and running your jobs asynchronously
+//! using Tokio.
 #![cfg_attr(feature = "docs", feature(doc_cfg))]
 #![warn(missing_docs)]
 mod config;
