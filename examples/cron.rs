@@ -52,7 +52,7 @@ async fn main() {
         let config = RunnerConfig::default().check_interval(Duration::from_secs(1));
         let job_runner = JobRunner::new(config).add_job(my_job.clone());
 
-        tokio::time::delay_for(Duration::from_millis(50)).await;
+        tokio::time::sleep(Duration::from_millis(50)).await;
         tokio::spawn(async move {
             if let Err(e) = job_runner.start().await {
                 log::error!("error: {}", e);
@@ -60,7 +60,7 @@ async fn main() {
         });
     }
 
-    tokio::time::delay_for(Duration::from_secs(11)).await;
+    tokio::time::sleep(Duration::from_secs(11)).await;
 
     assert!(COUNTER.load(SeqCst) >= 5);
     log::info!("Success!");

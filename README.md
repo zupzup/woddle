@@ -12,10 +12,10 @@ An async, synchronized, database-backed Rust job scheduler
 
 ```toml
 [dependencies]
-woddle = "0.1"
+woddle = "0.2"
 
 # For connection pooling
-# woddle = { version = "0.1", features = ["pool-mobc"] }
+# woddle = { version = "0.2", features = ["pool-mobc"] }
 ```
 
 ## Features

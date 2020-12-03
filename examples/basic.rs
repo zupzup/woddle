@@ -20,7 +20,7 @@ struct MyJob {
 impl Job for MyJob {
     async fn run(&self) {
         log::info!("starting  my job!");
-        tokio::time::delay_for(Duration::from_secs(2)).await;
+        tokio::time::sleep(Duration::from_secs(2)).await;
         let val = COUNTER.fetch_add(1, SeqCst);
         log::info!("job context: {:?}", self.ctx);
         log::info!("job done: time: {}, counter: {}", Utc::now(), val);
@@ -52,7 +52,7 @@ async fn main() {
         }
     });
 
-    tokio::time::delay_for(Duration::from_secs(11)).await;
+    tokio::time::sleep(Duration::from_secs(11)).await;
 
     assert!(COUNTER.load(SeqCst) == 2);
     log::info!("Success!");

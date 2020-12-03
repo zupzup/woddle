@@ -47,7 +47,7 @@ async fn test_basic() {
         }
     });
 
-    tokio::time::delay_for(Duration::from_millis(1100)).await;
+    tokio::time::sleep(Duration::from_millis(1100)).await;
 
     assert!(COUNTER.load(SeqCst) == 2);
 }

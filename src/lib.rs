@@ -173,7 +173,7 @@ impl JobRunner {
         self.announce_jobs();
 
         if let Some(initial_delay) = self.config.initial_delay {
-            tokio::time::delay_for(initial_delay).await;
+            tokio::time::sleep(initial_delay).await;
         }
 
         let mut job_interval = tokio::time::interval(self.config.check_interval);
@@ -197,10 +197,10 @@ impl JobRunner {
 
     // Asserts that the woddle_jobs table is there and insert all new jobs
     async fn initialize(&self) -> Result<(), Error> {
-        let mut con = db::get_con(&self.config).await.map_err(Error::DBError)?;
-        db::create_tables(&mut con).await.map_err(Error::DBError)?;
+        let con = db::get_con(&self.config).await.map_err(Error::DBError)?;
+        db::create_tables(&con).await.map_err(Error::DBError)?;
         for j in self.jobs.iter() {
-            db::insert_job(&mut con, &j).await.map_err(Error::DBError)?;
+            db::insert_job(&con, &j).await.map_err(Error::DBError)?;
         }
         Ok(())
     }
