@@ -108,7 +108,7 @@ pub trait Job: JobClone {
     /// Runs the job
     ///
     /// This is an async function, so if you plan to do long-running, blocking operations, you
-    /// should spawn them on [Tokio's Blocking Threadpool](https://docs.rs/tokio/0.2/tokio/task/fn.spawn_blocking.html).
+    /// should spawn them on [Tokio's Blocking Threadpool](https://docs.rs/tokio/latest/tokio/task/fn.spawn_blocking.html).
     ///
     /// You need the `blocking` feature to be active, for this to work.
     ///
