@@ -1,7 +1,7 @@
 [package]
 name = "woddle"
 description = "An async, synchronized, database-backed Rust job scheduler"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Mario Zupan <mario@zupzup.org>"]
 edition = "2018"
 license = "Apache-2.0"

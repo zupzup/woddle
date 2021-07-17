@@ -153,6 +153,21 @@ impl JobRunner {
         }
     }
 
+    /// Creates a new runner based on the given RunnerConfig and vector of jobs
+    pub fn new_with_vec(
+        config: RunnerConfig,
+        jobs: Vec<impl Job + Send + Sync + Clone + 'static>,
+    ) -> Self {
+        let mut boxed_jobs = vec![];
+        for j in jobs {
+            boxed_jobs.push(Box::new(j) as BoxedJob);
+        }
+        Self {
+            config,
+            jobs: boxed_jobs,
+        }
+    }
+
     /// Adds a job to the Runner
     pub fn add_job(mut self, job: impl Job + Send + Sync + Clone + 'static) -> Self {
         self.jobs.push(Box::new(job) as BoxedJob);
