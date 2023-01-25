@@ -6,16 +6,16 @@
 
 An async, synchronized, database-backed Rust job scheduler
 
-**Note: woddle requires at least Rust 1.39.**
+**Note: woddle requires at least Rust 1.60.**
 
 ## Usage
 
 ```toml
 [dependencies]
-woddle = "0.3"
+woddle = "0.4"
 
 # For connection pooling
-# woddle = { version = "0.3", features = ["pool-mobc"] }
+# woddle = { version = "0.4", features = ["pool-mobc"] }
 ```
 
 ## Features
