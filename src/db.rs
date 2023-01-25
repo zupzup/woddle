@@ -105,7 +105,7 @@ pub(crate) async fn update_job_if_ready(
             .map_err(DBError::UpdateJobError)?,
     );
 
-    if is_ready_to_run(&job, &db_job.last_run) {
+    if is_ready_to_run(job, &db_job.last_run) {
         let updated_rows = tx
             .execute(UPDATE_JOB_QUERY, &[&job.get_config().name])
             .await
@@ -219,7 +219,7 @@ mod tests {
         let job = Box::new(TestJob {
             cfg: JobConfig::new("test", "test").interval(Duration::from_secs(1)),
         }) as BoxedJob;
-        assert_eq!(true, is_ready_to_run(&job, &None));
+        assert!(is_ready_to_run(&job, &None));
     }
 
     #[test]
@@ -227,7 +227,7 @@ mod tests {
         let job = Box::new(TestJob {
             cfg: JobConfig::new("test", "test").cron("* * * * * * *"),
         }) as BoxedJob;
-        assert_eq!(true, is_ready_to_run(&job, &None));
+        assert!(is_ready_to_run(&job, &None));
     }
 
     #[test]
@@ -235,7 +235,7 @@ mod tests {
         let job = Box::new(TestJob {
             cfg: JobConfig::new("test", "test").cron("0 30 9 1 * * 2100"),
         }) as BoxedJob;
-        assert_eq!(false, is_ready_to_run(&job, &Some(Utc::now())));
+        assert!(!is_ready_to_run(&job, &Some(Utc::now())));
     }
 
     #[test]
@@ -243,7 +243,7 @@ mod tests {
         let job = Box::new(TestJob {
             cfg: JobConfig::new("test", "test").interval(Duration::from_secs(10000)),
         }) as BoxedJob;
-        assert_eq!(false, is_ready_to_run(&job, &Some(Utc::now())));
+        assert!(!is_ready_to_run(&job, &Some(Utc::now())));
     }
 
     #[test]
@@ -251,17 +251,14 @@ mod tests {
         let job = Box::new(TestJob {
             cfg: JobConfig::new("test", "test").interval(Duration::from_secs(20)),
         }) as BoxedJob;
-        assert_eq!(
-            true,
-            is_ready_to_run(
-                &job,
-                &Some(
-                    Utc::now()
-                        .checked_sub_signed(chrono::Duration::minutes(60))
-                        .unwrap()
-                )
+        assert!(is_ready_to_run(
+            &job,
+            &Some(
+                Utc::now()
+                    .checked_sub_signed(chrono::Duration::minutes(60))
+                    .unwrap()
             )
-        );
+        ));
     }
 
     #[test]
@@ -269,6 +266,6 @@ mod tests {
         let job = Box::new(TestJob {
             cfg: JobConfig::new("test", "test").cron("0 30 9 1 * * 2018"),
         }) as BoxedJob;
-        assert_eq!(false, is_ready_to_run(&job, &Some(Utc::now())));
+        assert!(!is_ready_to_run(&job, &Some(Utc::now())));
     }
 }

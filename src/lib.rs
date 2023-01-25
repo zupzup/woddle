@@ -215,7 +215,7 @@ impl JobRunner {
         let con = db::get_con(&self.config).await.map_err(Error::DBError)?;
         db::create_tables(&con).await.map_err(Error::DBError)?;
         for j in self.jobs.iter() {
-            db::insert_job(&con, &j).await.map_err(Error::DBError)?;
+            db::insert_job(&con, j).await.map_err(Error::DBError)?;
         }
         Ok(())
     }
