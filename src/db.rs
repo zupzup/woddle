@@ -54,14 +54,12 @@ const UPDATE_JOB_QUERY: &str =
 
 #[derive(Debug)]
 struct DBJob {
-    pub sync_key: String,
     pub last_run: Option<DateTime<Utc>>,
 }
 
 impl DBJob {
     pub fn from_row(row: &Row) -> Self {
         Self {
-            sync_key: row.get(0),
             last_run: row.get(1),
         }
     }
@@ -79,7 +77,7 @@ pub(crate) async fn create_tables(client: &Client) -> Result<(), DBError> {
 // Inserts a job into the woddle_jobs table, if doesn't exist yet
 pub(crate) async fn insert_job(client: &Client, job: &BoxedJob) -> Result<(), DBError> {
     client
-        .execute(INSERT_JOB_QUERY, &[&job.get_config().name])
+        .execute(INSERT_JOB_QUERY, &[&job.get_config().sync_key])
         .await
         .map_err(DBError::CreateJobError)?;
     Ok(())
@@ -100,14 +98,14 @@ pub(crate) async fn update_job_if_ready(
         .map_err(DBError::UpdateJobError)?;
 
     let db_job = DBJob::from_row(
-        &tx.query_one(LOCK_JOB_QUERY, &[&job.get_config().name])
+        &tx.query_one(LOCK_JOB_QUERY, &[&job.get_config().sync_key])
             .await
             .map_err(DBError::UpdateJobError)?,
     );
 
     if is_ready_to_run(job, &db_job.last_run) {
         let updated_rows = tx
-            .execute(UPDATE_JOB_QUERY, &[&job.get_config().name])
+            .execute(UPDATE_JOB_QUERY, &[&job.get_config().sync_key])
             .await
             .map_err(DBError::UpdateJobError)?;
 

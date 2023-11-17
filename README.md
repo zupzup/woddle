@@ -1,5 +1,5 @@
-[![CI](https://travis-ci.org/zupzup/woddle.svg?branch=main)](https://travis-ci.org/zupzup/woddle)
-[![crates.io](https://meritbadge.herokuapp.com/woddle)](https://crates.io/crates/woddle)
+[![CI](https://app.travis-ci.com/zupzup/woddle.svg?branch=main)](https://app.travis-ci.com/zupzup/woddle)
+[![crates.io](https://img.shields.io/crates/v/woddle.svg)](https://crates.io/crates/woddle)
 [![docs](https://docs.rs/woddle/badge.svg)](https://docs.rs/woddle)
 
 # woddle
@@ -12,10 +12,10 @@ An async, synchronized, database-backed Rust job scheduler
 
 ```toml
 [dependencies]
-woddle = "0.4"
+woddle = "0.5"
 
 # For connection pooling
-# woddle = { version = "0.4", features = ["pool-mobc"] }
+# woddle = { version = "0.5", features = ["pool-mobc"] }
 ```
 
 ## Features
