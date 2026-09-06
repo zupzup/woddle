@@ -6,23 +6,23 @@ use tokio_postgres::{row::Row, Client, NoTls};
 /// Database error cases
 #[derive(Debug)]
 pub enum DBError {
-    ConnectionError(tokio_postgres::Error),
-    CreateJobError(tokio_postgres::Error),
-    CreateTableError(tokio_postgres::Error),
-    UpdateJobError(tokio_postgres::Error),
+    Connection(tokio_postgres::Error),
+    CreateJob(tokio_postgres::Error),
+    CreateTable(tokio_postgres::Error),
+    UpdateJob(tokio_postgres::Error),
     #[cfg(feature = "pool-mobc")]
-    PoolError(mobc::Error<tokio_postgres::Error>),
+    Pool(mobc::Error<tokio_postgres::Error>),
 }
 
 impl std::error::Error for DBError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match *self {
-            DBError::ConnectionError(ref err) => Some(err),
-            DBError::CreateJobError(ref err) => Some(err),
-            DBError::CreateTableError(ref err) => Some(err),
-            DBError::UpdateJobError(ref err) => Some(err),
+            DBError::Connection(ref err) => Some(err),
+            DBError::CreateJob(ref err) => Some(err),
+            DBError::CreateTable(ref err) => Some(err),
+            DBError::UpdateJob(ref err) => Some(err),
             #[cfg(feature = "pool-mobc")]
-            DBError::PoolError(ref err) => Some(err),
+            DBError::Pool(ref err) => Some(err),
         }
     }
 }
@@ -30,16 +30,16 @@ impl std::error::Error for DBError {
 impl fmt::Display for DBError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            DBError::ConnectionError(ref e) => write!(f, "error connecting to the database: {}", e),
-            DBError::CreateJobError(ref e) => {
+            DBError::Connection(ref e) => write!(f, "error connecting to the database: {}", e),
+            DBError::CreateJob(ref e) => {
                 write!(f, "error creating a job in the database: {}", e)
             }
-            DBError::CreateTableError(ref e) => {
+            DBError::CreateTable(ref e) => {
                 write!(f, "error during creating sync table: {}", e)
             }
-            DBError::UpdateJobError(ref e) => write!(f, "error during db update: {}", e),
+            DBError::UpdateJob(ref e) => write!(f, "error during db update: {}", e),
             #[cfg(feature = "pool-mobc")]
-            DBError::PoolError(ref e) => write!(f, "error getting connection from the pool: {}", e),
+            DBError::Pool(ref e) => write!(f, "error getting connection from the pool: {}", e),
         }
     }
 }
@@ -70,7 +70,7 @@ pub(crate) async fn create_tables(client: &Client) -> Result<(), DBError> {
     client
         .execute(ASSERT_JOBS_TABLE_QUERY, &[])
         .await
-        .map_err(DBError::CreateTableError)?;
+        .map_err(DBError::CreateTable)?;
     Ok(())
 }
 
@@ -79,7 +79,7 @@ pub(crate) async fn insert_job(client: &Client, job: &BoxedJob) -> Result<(), DB
     client
         .execute(INSERT_JOB_QUERY, &[&job.get_config().sync_key])
         .await
-        .map_err(DBError::CreateJobError)?;
+        .map_err(DBError::CreateJob)?;
     Ok(())
 }
 
@@ -92,29 +92,26 @@ pub(crate) async fn update_job_if_ready(
     client: &mut Client,
     job: &BoxedJob,
 ) -> Result<bool, DBError> {
-    let tx = client
-        .transaction()
-        .await
-        .map_err(DBError::UpdateJobError)?;
+    let tx = client.transaction().await.map_err(DBError::UpdateJob)?;
 
     let db_job = DBJob::from_row(
         &tx.query_one(LOCK_JOB_QUERY, &[&job.get_config().sync_key])
             .await
-            .map_err(DBError::UpdateJobError)?,
+            .map_err(DBError::UpdateJob)?,
     );
 
     if is_ready_to_run(job, &db_job.last_run) {
         let updated_rows = tx
             .execute(UPDATE_JOB_QUERY, &[&job.get_config().sync_key])
             .await
-            .map_err(DBError::UpdateJobError)?;
+            .map_err(DBError::UpdateJob)?;
 
-        tx.commit().await.map_err(DBError::UpdateJobError)?;
+        tx.commit().await.map_err(DBError::UpdateJob)?;
 
         return Ok(updated_rows == 1);
     }
 
-    tx.commit().await.map_err(DBError::UpdateJobError)?;
+    tx.commit().await.map_err(DBError::UpdateJob)?;
     Ok(false)
 }
 
@@ -182,11 +179,7 @@ pub(crate) async fn get_con(cfg: &RunnerConfig) -> Result<Client, DBError> {
 }
 
 async fn get_new_con(cfg: &RunnerConfig) -> Result<Client, DBError> {
-    let (client, connection) = cfg
-        .db
-        .connect(NoTls)
-        .await
-        .map_err(DBError::ConnectionError)?;
+    let (client, connection) = cfg.db.connect(NoTls).await.map_err(DBError::Connection)?;
 
     tokio::spawn(connection);
     Ok(client)

@@ -22,7 +22,6 @@
 //! Once everything is configured, you can run the `JobRunner` and, if it doesn't return an error
 //! during job validation, it will run forever, scheduling and running your jobs asynchronously
 //! using Tokio.
-#![cfg_attr(feature = "docs", feature(doc_cfg))]
 #![warn(missing_docs)]
 mod config;
 
@@ -98,7 +97,6 @@ impl fmt::Display for Error {
 ///
 /// fn main() {
 ///     let job_cfg = JobConfig::new("my_job", "someSyncKey").interval(Duration::from_secs(5));
-
 ///     let my_job = MyJob {
 ///         config: job_cfg,
 ///     };
@@ -195,7 +193,7 @@ impl JobRunner {
         let jobs = Arc::new(&self.jobs);
         loop {
             job_interval.tick().await;
-            self.check_and_run_jobs(jobs.clone()).await;
+            self.check_and_run_jobs(jobs.as_ref()).await;
         }
     }
 
@@ -246,7 +244,7 @@ impl JobRunner {
     }
 
     // Checks and runs, if necessary, all jobs concurrently
-    async fn check_and_run_jobs(&self, jobs: Arc<&Vec<BoxedJob>>) {
+    async fn check_and_run_jobs(&self, jobs: &Vec<BoxedJob>) {
         let job_futures = jobs
             .iter()
             .map(|job| {

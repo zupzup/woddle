@@ -7,6 +7,6 @@ pub(crate) type DBPool = Pool<PgConnectionManager<NoTls>>;
 
 // Gets a database connection from the connection pool
 pub(crate) async fn get_con(pool: &DBPool) -> Result<Client, DBError> {
-    let con = pool.get().await.map_err(DBError::PoolError)?;
+    let con = pool.get().await.map_err(DBError::Pool)?;
     Ok(con.into_inner())
 }

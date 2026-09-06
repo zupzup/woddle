@@ -8,6 +8,7 @@ static OTHER_COUNTER: AtomicUsize = AtomicUsize::new(0);
 
 #[derive(Clone, Debug)]
 struct MyJobContext {
+    #[allow(unused)]
     pub name: String,
 }
 

@@ -9,6 +9,7 @@ use woddle::{async_trait, Job, JobConfig, JobRunner, RunnerConfig};
 static COUNTER: AtomicUsize = AtomicUsize::new(0);
 
 #[derive(Clone, Debug)]
+#[allow(unused)]
 struct MyJobContext {
     pub name: String,
 }

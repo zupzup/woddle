@@ -101,7 +101,7 @@ async fn main() {
 
 ### More Examples
 
-Can be found in the [examples](https://github.com/zupzup/woddle/tree/main/examples) folder.
+Can be found in the [examples](https://git.sr.ht/~zupzup/woddle/tree/main/item/examples) folder.
 
 And ran with:
 
